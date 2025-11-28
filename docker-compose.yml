@@ -1,0 +1,28 @@
+services:
+  image_storage:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: python start.py
+    ports:
+      - 8001:8000
+    environment:
+      - DATABASE_HOSTNAME=patient_data
+      - DATABASE_PORT=5432
+      - DATABASE_PASSWORD=mypassword
+      - DATABASE_NAME=patientdata
+      - DATABASE_USERNAME=postgres
+    depends_on:
+      content_db:
+        condition: service_healthy
+
+patient_data:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=patientdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d contentdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
