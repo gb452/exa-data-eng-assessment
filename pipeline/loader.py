@@ -65,7 +65,6 @@ def load_json_to_object(json_entry: dict[str, Any]):
 
     try:
         resource_type = json_entry["resourceType"]
-        print(f"Loading JSON as resource type {resource_type}")
         loaded_resource = RESOURCE_MAP[resource_type].model_validate(json_entry)
     except Exception as exc:
         print(f"Failed to load data into FHIR Resource: {exc}")

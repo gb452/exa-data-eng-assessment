@@ -1,2 +1,3 @@
 fhir.resources[r4b]
 sqlalchemy
+psycopg2-binary

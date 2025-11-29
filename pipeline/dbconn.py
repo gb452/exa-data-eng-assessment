@@ -15,11 +15,11 @@ def get_db_engine() -> Engine:
     
     :return: sqlalchemy.engine.Engine instance
     """
-    db_host = os.getenv('DATABASE_HOSTNAME')
-    db_port = os.getenv('DATABASE_PORT')
-    db_name = os.getenv('DATABASE_NAME')
-    db_user = os.getenv('DATABASE_USERNAME')
-    db_pass = os.getenv('DATABASE_PASSWORD')
+    db_host = os.getenv('DATABASE_HOSTNAME', "localhost")
+    db_port = os.getenv('DATABASE_PORT', "5433")
+    db_name = os.getenv('DATABASE_NAME', "patientdata")
+    db_user = os.getenv('DATABASE_USERNAME', "postgres")
+    db_pass = os.getenv('DATABASE_PASSWORD', "mypassword")
 
     db_url = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
 
