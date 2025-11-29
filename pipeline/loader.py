@@ -11,7 +11,7 @@ from typing import Any
 from extract import patient, encounter, condition, diagnosticreport, documentreference, claim, explanationofbenefit, observation, \
     procedure, careteam, careplan, immunization, medicationrequest, imagingstudy, medication, medicationadministraction, provenance
 
-# The code below is partially AI generated
+# Various bits below are AI generated (I marked where it ends)
 
 # A mapping of resource type to extraction function
 # The keys in this are also used to import all the necessary modules in
@@ -53,14 +53,16 @@ def _load_resource_class(resource_name: str) -> FHIRAbstractModel:
     """
     # import the module, for example fhir.resources.patient
     # we need to specify fhir version R4B as the package defaults to R5.
+    # The data provided is version R4B.
     module = importlib.import_module(f"fhir.resources.R4B.{resource_name.lower()}")
     # get the object from the module. for example, fhir.resources.patient contains the module Patient
     # the mapping in resource_types above is used for this
     return getattr(module, resource_name)
 
-# create a reusable mapping containing all of the modules we need to process the example data
+# finally, create a reusable mapping containing all of the modules we need to process the example data
 RESOURCE_MAP = {name: _load_resource_class(name) for name in RESOURCE_TYPES}
 # this is the end of the AI code
+
 
 def load_and_transform_json(json_entry: dict[str, Any]):
     """

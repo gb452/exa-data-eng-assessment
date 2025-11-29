@@ -7,14 +7,11 @@ The data is nested if left as is so it can't be transferred directly to
 a database.
 """
 
-import json
-import time
-
 from datetime import datetime
 
-from fhir.resources.R4B.patient import Patient
+from fhir.resources.R4B.claim import Claim
 
-def patient(patient: Patient):
+def patient(patient):
     """
     Extract data from a Patient model to get it ready for database entry.
     """
@@ -64,36 +61,53 @@ def patient(patient: Patient):
 
     return return_dict
 
-
-# TODO - are all these actually needed? Do we want everything from the data or just the essentials?
+# TODO
 def encounter():
     pass
 
-def condition():  # want
-    pass
+def condition(condition):
 
-def diagnosticreport():
-    pass
+    return_dict = {}
 
-def documentreference():
-    pass
 
-def claim():  # want
-    pass
+    return_dict["condition_id"] = condition.id
+    return_dict["medical_record_number"] = condition.subject.reference.split(":")[-1]
+    return_dict["encounter"] = condition.encounter.reference.split(":")[-1]
 
-def explanationofbenefit():
-    pass
+    return_dict["clinical_status"] = condition.clinicalStatus.coding[0].code
+    return_dict["verification_status"] = condition.verificationStatus.coding[0].code
+    return_dict["category"] = condition.category[0].coding[0].display
+    return_dict["onset_date"] = datetime.strftime(condition.onsetDateTime, "%Y-%m-%d %H:%M:%S")
+    # not every condition has been abated
+    try:
+        return_dict["abatement_date"] = datetime.strftime(condition.abatementDateTime, "%Y-%m-%d %H:%M:%S")
+    except (KeyError, TypeError):
+        return_dict["abatement_date"] = None
+    return_dict["condition_information"] = condition.code.text
 
-def observation():  # want?
-    pass
+    return return_dict
+
+def claim(claim: Claim):
+    """
+    Transform claim data into a usable format
+    """
+
+    return_dict = {}
+
+    return_dict["claim_id"] = claim.id
+    return_dict["medical_record_number"] = claim.patient.reference.split(":")[-1]
+    return_dict["encounter"] = claim.item[0].encounter[0].reference.split(":")[-1]
+    return_dict["status"] = claim.status
+    return_dict["billable_period_start"] = datetime.strftime(claim.billablePeriod.start, "%Y-%m-%d %H:%M:%S")
+    return_dict["billable_period_end"] = datetime.strftime(claim.billablePeriod.end, "%Y-%m-%d %H:%M:%S")
+    return_dict["provider"] = claim.provider.display
+    return_dict["priority"] = claim.priority.coding[0].code
+    return_dict["insurance_coverage"] = claim.insurance[0].coverage.display
+    return_dict["total_cost"] = f"{(claim.total.value):.2f}{claim.total.currency}"
+    
+    return return_dict
 
 def procedure():  # want
-    pass
-
-def careteam():
-    pass
-
-def careplan():
     pass
 
 def immunization():  # want
@@ -102,14 +116,8 @@ def immunization():  # want
 def medicationrequest():
     pass
 
+def medication():
+    pass
+
 def imagingstudy():
-    pass
-
-def medication():  # want
-    pass
-
-def medicationadministraction():
-    pass
-
-def provenance():
     pass
