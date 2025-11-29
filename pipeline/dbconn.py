@@ -4,11 +4,14 @@ Utility code to get a connection to the postgres database
 I consider this boilerplate code, so the AI helped with generating this.
 """
 
+from functools import lru_cache
+
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
 
+@lru_cache()
 def get_db_engine() -> Engine:
     """
     Get a connection to the database

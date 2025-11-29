@@ -8,28 +8,35 @@ from fhir_core.fhirabstractmodel import FHIRAbstractModel
 import importlib
 from typing import Any
 
-# The code below is AI generated
-# Before this I imported each object from fhir.resources manually, and then set up a dict mapping for each.
-# However that is really ugly and doing it this way does both the imports and the mapping in one go.
-resource_types = [
-    "Patient",
-    "Encounter",
-    "Condition",
-    "DiagnosticReport",
-    "DocumentReference",
-    "Claim",
-    "ExplanationOfBenefit",
-    "Observation",
-    "Procedure",
-    "CareTeam",
-    "CarePlan",
-    "Immunization",
-    "MedicationRequest",
-    "ImagingStudy",
-    "Medication",
-    "MedicationAdministration",
-    "Provenance",
-]
+from extract import patient, encounter, condition, diagnosticreport, documentreference, claim, explanationofbenefit, observation, \
+    procedure, careteam, careplan, immunization, medicationrequest, imagingstudy, medication, medicationadministraction, provenance
+
+# The code below is partially AI generated
+
+# A mapping of resource type to extraction function
+# The keys in this are also used to import all the necessary modules in
+# the _load_resource_class function so that there aren't a load of
+# ugly imports at the top of this file
+RESOURCE_TYPES = {
+    "Patient": patient,
+    "Encounter": encounter,
+    "Condition": condition,
+    "DiagnosticReport": diagnosticreport,
+    "DocumentReference": documentreference,
+    "Claim": claim,
+    "ExplanationOfBenefit": explanationofbenefit,
+    "Observation": observation,
+    "Procedure": procedure,
+    "CareTeam": careteam,
+    "CarePlan": careplan,
+    "Immunization": immunization,
+    "MedicationRequest": medicationrequest,
+    "ImagingStudy": imagingstudy,
+    "Medication": medication,
+    "MedicationAdministration": medicationadministraction,
+    "Provenance": provenance
+}
+
 
 def _load_resource_class(resource_name: str) -> FHIRAbstractModel:
     """
@@ -52,20 +59,24 @@ def _load_resource_class(resource_name: str) -> FHIRAbstractModel:
     return getattr(module, resource_name)
 
 # create a reusable mapping containing all of the modules we need to process the example data
-RESOURCE_MAP = {name: _load_resource_class(name) for name in resource_types}
+RESOURCE_MAP = {name: _load_resource_class(name) for name in RESOURCE_TYPES}
 # this is the end of the AI code
 
-def load_json_to_object(json_entry: dict[str, Any]):
+def load_and_transform_json(json_entry: dict[str, Any]):
     """
-    Given a raw JSON entry from a fhir file, load it into a fhir.resources object.
+    Given a raw JSON entry from a fhir file, load it into a fhir.resources object and transform it into
+    a usable dictionary of information.
 
     :param json_entry: JSON entry from the fhir file.
-    :return: fhir.resources object for this entry type.
+    :return: dict of values useful for this type.
     """
 
     try:
+        # find our resource type
         resource_type = json_entry["resourceType"]
+        # load our raw data into the fhir.resources class to validate it
         loaded_resource = RESOURCE_MAP[resource_type].model_validate(json_entry)
+        # use the resource types dict to then send that object to the transformation function
+        return RESOURCE_TYPES[resource_type](loaded_resource)
     except Exception as exc:
         print(f"Failed to load data into FHIR Resource: {exc}")
-    return loaded_resource

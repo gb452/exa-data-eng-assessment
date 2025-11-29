@@ -1,6 +1,3 @@
-
-
-
 import time
 import json
 import os
@@ -8,7 +5,8 @@ from shutil import move
 
 import pandas as pd
 
-from loader import RESOURCE_MAP, load_json_to_object
+# from extract import extract_patient 
+from loader import load_json_to_object
 from constants import FILE_DIR, PROCESSED_FILE_DIR, FAILED_FILE_DIR
 
 from dbconn import get_db_engine
@@ -49,27 +47,16 @@ def start():
 
             # each fhir file has all of the data under the "entry" key.
             for patient_data_entry in raw_json["entry"]:
-                fhir_objects.append(load_json_to_object(patient_data_entry["resource"]))
-            patient = fhir_objects[0]
-
-            print(patient.name[0].given[0])
-            print(patient.name[0].family)
-            # print(patient)
-
-            df = pd.json_normalize(patient.dict())
-
-
-            for col in list(df.columns):
-                if isinstance(df[col][0], list):
-                    df[col] = df[col].apply(json.dumps)
-            print(df.columns)
-            df.to_sql(name="Patient", con=get_db_engine(), if_exists="replace", index=False)
-            # TODO will need to probably manually get things out of the model since it's not very good looking in the database.
-
-                #     move(os.path.join(FILE_DIR, input_file), os.path.join(PROCESSED_FILE_DIR, input_file))
-                # except Exception as exc:
-                #     print(exc)
-                #     move(os.path.join(FILE_DIR, input_file), os.path.join(FAILED_FILE_DIR, input_file))
+                if patient_data_entry["resource"]["resourceType"] == "Patient":
+                    fhir_objects.append(load_json_to_object(patient_data_entry["resource"]))
+            for fhir_object in fhir_objects:
+                print(fhir_object)
+                dataframe = pd.json_normalize(fhir_object)
+                # Below line is AI generated - drops the "resource." part from column names.
+                dataframe.columns = dataframe.columns.str.replace('^resource\.', '', regex=True)
+                
+                # put this section of the data into the database
+                dataframe.to_sql(name="Patient", con=get_db_engine(), if_exists="append", index=False)
 
 
 if __name__ =="__main__":
