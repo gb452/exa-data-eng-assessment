@@ -1,11 +1,7 @@
 services:
-  image_storage:
+  data_processing:
     build:
       context: .
-      dockerfile: ./Dockerfile
-    command: python start.py
-    ports:
-      - 8001:8000
     environment:
       - DATABASE_HOSTNAME=patient_data
       - DATABASE_PORT=5432
@@ -13,20 +9,22 @@ services:
       - DATABASE_NAME=patientdata
       - DATABASE_USERNAME=postgres
     volumes:
-      - ./pipeline/files:./pipeline/files
+      - ./pipeline/files:/pipeline/files
     depends_on:
-      content_db:
+      patient_data:
         condition: service_healthy
 
-patient_data:
-    image: postgres
-    environment:
-      - POSTGRES_PASSWORD=mypassword
-      - POSTGRES_DB=patientdata
-    volumes:
-      - ./database:/var/lib/postgresql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d contentdb"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+  patient_data:
+      image: postgres
+      ports:
+        - 5433:5432
+      environment:
+        - POSTGRES_PASSWORD=mypassword
+        - POSTGRES_DB=patientdata
+      volumes:
+        - ./database:/var/lib/postgresql
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U postgres -d patientdata"]
+        interval: 5s
+        timeout: 5s
+        retries: 10

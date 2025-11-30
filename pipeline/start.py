@@ -24,8 +24,8 @@ def start():
     """
     Main function for running the pipeline.
 
-    Continually read files from the input directory, load them in, transform them to usable data and send them to the
-    Postgres database.
+    Continually read files from the input directory, load them in, transform them to usable data and send
+    them to the Postgres database.
 
     Once a file has been ingested, move then to a subfolder within the input directory called "finished".
     If it fails move it to a subfolder called "failed".
@@ -57,9 +57,10 @@ def start():
                     for fhir_object in fhir_objects:
                         send_object(fhir_object)
                     move(os.path.join(FILE_DIR, input_file), os.path.join(PROCESSED_FILE_DIR, input_file))
+                    print(f"Successfully processed file {input_file}!")
                 except Exception as exc:
-                    print(f"Processing error: {exc}")
                     move(os.path.join(FILE_DIR, input_file), os.path.join(FAILED_FILE_DIR, input_file))
+                    print(f"Processing error: {exc}")
         time.sleep(1)
 
 

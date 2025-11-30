@@ -5,8 +5,9 @@ Utility code for using and accessing the database
 from functools import lru_cache
 
 import os
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import ProgrammingError
 
 from pandas import json_normalize
 
@@ -32,20 +33,49 @@ def get_db_engine() -> Engine:
     engine = create_engine(db_url)
     return engine
 
+
 def send_object(fhir_object):
     """
     Upload JSON representing the FHIR object to the database
     """
 
-    print(fhir_object)
     if fhir_object["data"]:
+        engine = get_db_engine()
+        # turn into a pandas dataframe
         entry = json_normalize(fhir_object["data"])
         # Below line is AI generated - drops the "resource." part from column names.
-        entry.columns = entry.columns.str.replace('^resource\.', '', regex=True)
+        entry.columns = entry.columns.str.replace('resource.', '')
+
+        try:
+            # check if this id already exists
+            with engine.connect() as connection:
+                exists = bool(connection.execute(
+                    text(f'SELECT id FROM "{fhir_object['table']}" WHERE id = :id'),
+                    {'id': fhir_object["data"]["id"]}
+                ).scalar())
+                print(f"From first section: {exists=}")
+        except ProgrammingError as exc:
+            # allow UndefinedTable error as if it doesn't exist it gets created below
+            print("does not exist?")
+            print(exc)
+            print("^")
+            exists = False
+        print(f"{exists=}")
+        if exists:
+            print(
+                f"ID {fhir_object['data']['id']} "
+                f"already exists in table {fhir_object['table']}, skipping.")
+            return
         
         # put this section of the data into the database
         # this is a super easy, perhaps somewhat hacky way, to create tables on the fly.
         # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_sql.html
-        # in a production environment it would be more sensible to create defined schemas for the tables,
-        # but for a simple ETL app like this it works.
-        entry.to_sql(name=fhir_object["table"], con=get_db_engine(), if_exists="append", index=False)
+        # in a production environment it would be more sensible to
+        # create defined schemas for the tables, but for a simple ETL app
+        # like this it works and it's also fast to set up
+        entry.to_sql(
+            name=fhir_object["table"],
+            con=engine,
+            if_exists="append",
+            index=False
+        )

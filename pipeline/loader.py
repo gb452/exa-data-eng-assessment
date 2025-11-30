@@ -4,8 +4,6 @@ Utility to load raw JSON data into the appropriate fhir.resources object
 Use a mapping so we can take the resourceType field from the JSON to know what object to use
 """
 
-import time
-
 from fhir_core.fhirabstractmodel import FHIRAbstractModel
 import importlib
 from typing import Any
@@ -15,6 +13,7 @@ from extract import patient, encounter, condition, claim, procedure, immunizatio
 # Various bits below are AI generated (I marked where it ends)
 
 # A mapping of resource type to extraction function
+# This is used in extract.py
 # The keys in this are also used to import all the necessary modules in
 # the _load_resource_class function so that there aren't a load of
 # ugly imports at the top of this file
@@ -52,11 +51,11 @@ def _load_resource_class(resource_name: str) -> FHIRAbstractModel:
     return getattr(module, resource_name)
 
 # finally, create a reusable mapping containing all of the modules we need to process the example data
-RESOURCE_MAP = {name: _load_resource_class(name) for name in RESOURCE_TYPES}
+IMPORT_MAP = {name: _load_resource_class(name) for name in RESOURCE_TYPES}
 # this is the end of the AI code
 
 
-def load_and_transform_json(json_entry: dict[str, Any]):
+def load_and_transform_json(json_entry: dict[str, Any]) -> dict[str, str]:
     """
     Given a raw JSON entry from a fhir file, load it into a fhir.resources object and transform it into
     a usable dictionary of information.
@@ -69,7 +68,7 @@ def load_and_transform_json(json_entry: dict[str, Any]):
         # find our resource type
         resource_type = json_entry["resourceType"]
         # load our raw data into the fhir.resources class to validate it
-        loaded_resource = RESOURCE_MAP[resource_type].model_validate(json_entry)
+        loaded_resource = IMPORT_MAP[resource_type].model_validate(json_entry)
         # use the resource types dict to then send that object to the transformation function
         return RESOURCE_TYPES[resource_type](loaded_resource)
     except Exception as exc:

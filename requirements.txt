@@ -1,3 +1,4 @@
-fhir.resources[r4b]
+fhir.resources
 sqlalchemy
 psycopg2-binary
+pandas

@@ -8,15 +8,20 @@ a database.
 
 The other benefit of using fhir.resources is that we don't have to
 directly access the JSON.
+
+These functions aren't directly called, instead they are used in the
+RESOURCE_TYPES dictionary in loader.py
 """
 
 from datetime import datetime
 
-from fhir.resources.R4B.claim import Claim
 
-def patient(patient):
+def patient(patient) -> dict[str, str]:
     """
     Extract data from a Patient model to get it ready for database entry.
+
+    :param patient: fhir.resources Patient object
+    :return: Processed and sanitised data in a dictionary ready for database entry
     """
 
     return_dict = {}
@@ -34,7 +39,7 @@ def patient(patient):
         if identifier.type and identifier.type.coding:
             for coding in identifier.type.coding:
                 if coding.code == 'MR':  # Medical Record Number
-                    return_dict["medical_record_number"] = identifier.value
+                    return_dict["id"] = identifier.value
                 elif coding.code == 'SS':  # Social Security Number
                     return_dict["social_security_number"] = identifier.value
                 elif coding.code == 'DL':  # Driver's License
@@ -69,11 +74,18 @@ def patient(patient):
 
     return return_dict
 
-def encounter(encounter):
+
+def encounter(encounter) -> dict[str, str]:
+    """
+    Extract data from an Encounter model to get it ready for database entry.
+
+    :param patient: fhir.resources Encounter object
+    :return: Processed and sanitised data in a dictionary ready for database entry
+    """
 
     return_dict = {}
-    return_dict["encounter_id"] = encounter.id
-    return_dict["medical_record_number"] = encounter.subject.reference.split(":")[-1]
+    return_dict["id"] = encounter.id
+    return_dict["patient_id"] = encounter.subject.reference.split(":")[-1]
     return_dict["status"] = encounter.status
     return_dict["type"] = encounter.type[0].coding[0].display
     return_dict["start_date"] = datetime.strftime(encounter.period.start, "%Y-%m-%d %H:%M:%S")
@@ -85,14 +97,20 @@ def encounter(encounter):
 
     return return_dict
 
-def condition(condition):
+
+def condition(condition) -> dict[str, str]:
+    """
+    Extract data from a Condition model to get it ready for database entry.
+
+    :param patient: fhir.resources Condition object
+    :return: Processed and sanitised data in a dictionary ready for database entry
+    """
 
     return_dict = {}
 
-
-    return_dict["condition_id"] = condition.id
-    return_dict["medical_record_number"] = condition.subject.reference.split(":")[-1]
-    return_dict["encounter"] = condition.encounter.reference.split(":")[-1]
+    return_dict["id"] = condition.id
+    return_dict["patient_id"] = condition.subject.reference.split(":")[-1]
+    return_dict["encounter_id"] = condition.encounter.reference.split(":")[-1]
 
     return_dict["clinical_status"] = condition.clinicalStatus.coding[0].code
     return_dict["verification_status"] = condition.verificationStatus.coding[0].code
@@ -107,15 +125,19 @@ def condition(condition):
 
     return return_dict
 
-def claim(claim: Claim):
+
+def claim(claim) -> dict[str, str]:
     """
-    Transform claim data into a usable format
+    Extract data from a Claim model to get it ready for database entry.
+
+    :param patient: fhir.resources Claim object
+    :return: Processed and sanitised data in a dictionary ready for database entry
     """
 
     return_dict = {}
 
-    return_dict["claim_id"] = claim.id
-    return_dict["medical_record_number"] = claim.patient.reference.split(":")[-1]
+    return_dict["id"] = claim.id
+    return_dict["patient_id"] = claim.patient.reference.split(":")[-1]
     return_dict["encounter_id"] = claim.item[0].encounter[0].reference.split(":")[-1]
     # not every claim has a condition associated with it, for example a general exam or assessment.
     try:
@@ -132,12 +154,19 @@ def claim(claim: Claim):
     
     return return_dict
 
-def procedure(procedure):
-    
+
+def procedure(procedure) -> dict[str, str]:
+    """
+    Extract data from a Procedure model to get it ready for database entry.
+
+    :param patient: fhir.resources Procedure object
+    :return: Processed and sanitised data in a dictionary ready for database entry
+    """
+
     return_dict = {}
 
-    return_dict["procedure_id"] = procedure.id
-    return_dict["medical_record_number"] = procedure.subject.reference.split(":")[-1]
+    return_dict["id"] = procedure.id
+    return_dict["patient_id"] = procedure.subject.reference.split(":")[-1]
     return_dict["encounter_id"] = procedure.encounter.reference.split(":")[-1]
     return_dict["status"] = procedure.status
     return_dict["performed_period_start"] = datetime.strftime(procedure.performedPeriod.start, "%Y-%m-%d %H:%M:%S")
@@ -146,12 +175,19 @@ def procedure(procedure):
 
     return return_dict
 
-def immunization(immunization):
+
+def immunization(immunization) -> dict[str, str]:
+    """
+    Extract data from an Immunization model to get it ready for database entry.
+
+    :param patient: fhir.resources Immunization object
+    :return: Processed and sanitised data in a dictionary ready for database entry
+    """
     
     return_dict = {}
 
-    return_dict["immunization_id"] = immunization.id
-    return_dict["medical_record_number"] = immunization.patient.reference.split(":")[-1]
+    return_dict["id"] = immunization.id
+    return_dict["patient_id"] = immunization.patient.reference.split(":")[-1]
     return_dict["encounter_id"] = immunization.encounter.reference.split(":")[-1]
     return_dict["vaccine_code"] = immunization.vaccineCode.coding[0].code
     return_dict["vaccine_type"] = immunization.vaccineCode.coding[0].display
@@ -160,12 +196,19 @@ def immunization(immunization):
 
     return return_dict
 
-def medicationrequest(medicationrequest):
+
+def medicationrequest(medicationrequest) -> dict[str, str]:
+    """
+    Extract data from a MedicationRequest model to get it ready for database entry.
+
+    :param patient: fhir.resources MedicationRequest object
+    :return: Processed and sanitised data in a dictionary ready for database entry
+    """
     
     return_dict = {}
 
-    return_dict["medication_request_id"] = medicationrequest.id
-    return_dict["medical_record_number"] = medicationrequest.subject.reference.split(":")[-1]
+    return_dict["id"] = medicationrequest.id
+    return_dict["patient_id"] = medicationrequest.subject.reference.split(":")[-1]
     return_dict["encounter_id"] = medicationrequest.encounter.reference.split(":")[-1]
     # not every request has a reason in there, for example ibuprofen does not appear to require one
     try:
@@ -174,14 +217,13 @@ def medicationrequest(medicationrequest):
         return_dict["condition_id"] = None
     return_dict["status"] = medicationrequest.status
     return_dict["intent"] = medicationrequest.intent
-    # not every medication request records the medication in there, sometimes it's listed as a separate Medication entry
+    # not every medication request records the medication in there,
+    # sometimes it's listed as a separate Medication entry
     try:
         return_dict["medication_code"] = medicationrequest.medicationCodeableConcept.coding[0].code
         return_dict["medication_name"] = medicationrequest.medicationCodeableConcept.coding[0].display
         return_dict["medication_reference_id"] = None
     except (KeyError, ValueError, AttributeError) as exc:
-        print(exc)
-        print("^")
         return_dict["medication_reference_id"] = medicationrequest.medicationReference.reference.split(":")[-1]
         return_dict["medication_code"] = None
         return_dict["medication_name"] = None
@@ -190,14 +232,20 @@ def medicationrequest(medicationrequest):
 
     return return_dict
 
-def medication(medication):
+
+def medication(medication) -> dict[str, str]:
+    """
+    Extract data from a Medication model to get it ready for database entry.
+
+    :param patient: fhir.resources Medication object
+    :return: Processed and sanitised data in a dictionary ready for database entry
+    """
     
     return_dict = {}
 
-    return_dict["medication_id"] = medication.id
+    return_dict["id"] = medication.id
     return_dict["medication_status"] = medication.status
     return_dict["medication_code"] = medication.code.coding[0].code
     return_dict["medication_name"] = medication.code.coding[0].display
 
     return return_dict
-
