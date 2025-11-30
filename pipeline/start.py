@@ -5,7 +5,7 @@ from shutil import move
 
 
 # from extract import extract_patient 
-from loader import load_and_transform_json
+from loader import load_and_transform_json, RESOURCE_TYPES
 from constants import FILE_DIR, PROCESSED_FILE_DIR, FAILED_FILE_DIR
 
 from database import send_object
@@ -49,7 +49,7 @@ def start():
 
                     # each fhir file has all of the data under the "entry" key.
                     for patient_data_entry in raw_json["entry"]:
-                        if patient_data_entry["resource"]["resourceType"] in ["Condition", "Claim", "Patient"]:  # TODO remove
+                        if patient_data_entry["resource"]["resourceType"] in RESOURCE_TYPES:
                             fhir_objects.append({
                                 "table": patient_data_entry["resource"]["resourceType"],
                                 "data": load_and_transform_json(patient_data_entry["resource"])

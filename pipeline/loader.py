@@ -4,12 +4,13 @@ Utility to load raw JSON data into the appropriate fhir.resources object
 Use a mapping so we can take the resourceType field from the JSON to know what object to use
 """
 
+import time
+
 from fhir_core.fhirabstractmodel import FHIRAbstractModel
 import importlib
 from typing import Any
 
-from extract import patient, encounter, condition, diagnosticreport, documentreference, claim, explanationofbenefit, observation, \
-    procedure, careteam, careplan, immunization, medicationrequest, imagingstudy, medication, medicationadministraction, provenance
+from extract import patient, encounter, condition, claim, procedure, immunization, medicationrequest, medication
 
 # Various bits below are AI generated (I marked where it ends)
 
@@ -21,20 +22,11 @@ RESOURCE_TYPES = {
     "Patient": patient,
     "Encounter": encounter,
     "Condition": condition,
-    "DiagnosticReport": diagnosticreport,
-    "DocumentReference": documentreference,
     "Claim": claim,
-    "ExplanationOfBenefit": explanationofbenefit,
-    "Observation": observation,
     "Procedure": procedure,
-    "CareTeam": careteam,
-    "CarePlan": careplan,
     "Immunization": immunization,
     "MedicationRequest": medicationrequest,
-    "ImagingStudy": imagingstudy,
     "Medication": medication,
-    "MedicationAdministration": medicationadministraction,
-    "Provenance": provenance
 }
 
 
