@@ -3,11 +3,11 @@ services:
     build:
       context: .
     environment:
-      - DATABASE_HOSTNAME=patient_data
-      - DATABASE_PORT=5432
-      - DATABASE_PASSWORD=mypassword
-      - DATABASE_NAME=patientdata
-      - DATABASE_USERNAME=postgres
+      - DATABASE_HOSTNAME=${DATABASE_HOSTNAME}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
     volumes:
       - ./pipeline/files:/pipeline/files
     depends_on:
@@ -19,8 +19,8 @@ services:
       ports:
         - 5433:5432
       environment:
-        - POSTGRES_PASSWORD=mypassword
-        - POSTGRES_DB=patientdata
+        - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+        - POSTGRES_DB=${DATABASE_NAME}
       volumes:
         - ./database:/var/lib/postgresql
       healthcheck:

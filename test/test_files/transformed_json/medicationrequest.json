@@ -1,0 +1,12 @@
+{
+    "id": "c874e064-3f6d-63b7-346a-9bdf53138c84",
+    "patient_id": "8c95253e-8ee8-9ae8-6d40-021d702dc78e",
+    "encounter_id": "e9864158-8f87-b1bf-3981-9d4828109563",
+    "condition_id": "ca0ceffc-cbf9-072c-7cf6-953e12d6ac7d",
+    "status": "stopped",
+    "intent": "order",
+    "medication_code": "313988",
+    "medication_name": "Furosemide 40 MG Oral Tablet",
+    "medication_reference_id": null,
+    "requester": "Dr. Burt293 Quigley282"
+}

@@ -1,0 +1,28 @@
+{
+      "resourceType": "Immunization",
+      "id": "eaa88d9e-c4a0-d2f4-a40c-0741ead3f532",
+      "meta": {
+        "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-immunization" ]
+      },
+      "status": "completed",
+      "vaccineCode": {
+        "coding": [ {
+          "system": "http://hl7.org/fhir/sid/cvx",
+          "code": "140",
+          "display": "Influenza, seasonal, injectable, preservative free"
+        } ],
+        "text": "Influenza, seasonal, injectable, preservative free"
+      },
+      "patient": {
+        "reference": "urn:uuid:8c95253e-8ee8-9ae8-6d40-021d702dc78e"
+      },
+      "encounter": {
+        "reference": "urn:uuid:93dab9db-4210-33f5-4023-57dd3e609bc8"
+      },
+      "occurrenceDateTime": "1990-09-17T03:00:18+01:00",
+      "primarySource": true,
+      "location": {
+        "reference": "Location?identifier=https://github.com/synthetichealth/synthea|08770baf-f5e6-3a1a-af4f-1d8be70df56f",
+        "display": "MASS LUNG AND ALLERGY PC"
+      }
+    }

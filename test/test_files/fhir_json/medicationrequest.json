@@ -1,0 +1,36 @@
+{
+      "resourceType": "MedicationRequest",
+      "id": "c874e064-3f6d-63b7-346a-9bdf53138c84",
+      "meta": {
+        "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationrequest" ]
+      },
+      "status": "stopped",
+      "intent": "order",
+      "medicationCodeableConcept": {
+        "coding": [ {
+          "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+          "code": "313988",
+          "display": "Furosemide 40 MG Oral Tablet"
+        } ],
+        "text": "Furosemide 40 MG Oral Tablet"
+      },
+      "subject": {
+        "reference": "urn:uuid:8c95253e-8ee8-9ae8-6d40-021d702dc78e"
+      },
+      "encounter": {
+        "reference": "urn:uuid:e9864158-8f87-b1bf-3981-9d4828109563"
+      },
+      "authoredOn": "1997-07-29T03:30:05+01:00",
+      "requester": {
+        "reference": "Practitioner?identifier=http://hl7.org/fhir/sid/us-npi|9999999909",
+        "display": "Dr. Burt293 Quigley282"
+      },
+      "reasonReference": [ {
+        "reference": "urn:uuid:ca0ceffc-cbf9-072c-7cf6-953e12d6ac7d"
+      } ],
+      "dosageInstruction": [ {
+        "sequence": 1,
+        "text": "Take as needed.",
+        "asNeededBoolean": true
+      } ]
+    }

@@ -249,3 +249,22 @@ def medication(medication) -> dict[str, str]:
     return_dict["medication_name"] = medication.code.coding[0].display
 
     return return_dict
+
+
+RESOURCE_MAPPING = {
+    "Patient": patient,
+    "Encounter": encounter,
+    "Condition": condition,
+    "Claim": claim,
+    "Procedure": procedure,
+    "Immunization": immunization,
+    "MedicationRequest": medicationrequest,
+    "Medication": medication,
+}
+
+def transform_json(resource_type, json_data):
+    
+    transformation_function = RESOURCE_MAPPING[resource_type]
+    
+    # return the output of the function
+    return transformation_function(json_data)

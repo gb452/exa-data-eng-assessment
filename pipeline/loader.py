@@ -8,25 +8,9 @@ from fhir_core.fhirabstractmodel import FHIRAbstractModel
 import importlib
 from typing import Any
 
-from extract import patient, encounter, condition, claim, procedure, immunization, medicationrequest, medication
+from constants import RESOURCE_TYPES
 
-# Various bits below are AI generated (I marked where it ends)
-
-# A mapping of resource type to extraction function
-# This is used in extract.py
-# The keys in this are also used to import all the necessary modules in
-# the _load_resource_class function so that there aren't a load of
-# ugly imports at the top of this file
-RESOURCE_TYPES = {
-    "Patient": patient,
-    "Encounter": encounter,
-    "Condition": condition,
-    "Claim": claim,
-    "Procedure": procedure,
-    "Immunization": immunization,
-    "MedicationRequest": medicationrequest,
-    "Medication": medication,
-}
+# Various bits below are AI generated and then adjusted by me over time (I marked where it ends)
 
 
 def _load_resource_class(resource_name: str) -> FHIRAbstractModel:
@@ -55,21 +39,18 @@ IMPORT_MAP = {name: _load_resource_class(name) for name in RESOURCE_TYPES}
 # this is the end of the AI code
 
 
-def load_and_transform_json(json_entry: dict[str, Any]) -> dict[str, str]:
+def load_json(json_entry: dict[str, Any]) -> dict[str, str]:
     """
-    Given a raw JSON entry from a fhir file, load it into a fhir.resources object and transform it into
-    a usable dictionary of information.
+    Given a raw JSON entry from a fhir file, load it into a fhir.resources object.
 
     :param json_entry: JSON entry from the fhir file.
-    :return: dict of values useful for this type.
+    :return: A fhir.resources object representing the data.
     """
-
     try:
         # find our resource type
         resource_type = json_entry["resourceType"]
         # load our raw data into the fhir.resources class to validate it
         loaded_resource = IMPORT_MAP[resource_type].model_validate(json_entry)
-        # use the resource types dict to then send that object to the transformation function
-        return RESOURCE_TYPES[resource_type](loaded_resource)
+        return loaded_resource
     except Exception as exc:
-        print(f"Failed to load data into FHIR Resource: {exc}")
+        print(f"Failed to load data into FHIR Resource: {exc}, {exc.__class__.__name__}")

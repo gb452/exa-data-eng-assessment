@@ -1,0 +1,30 @@
+{
+    "resourceType": "Procedure",
+    "id": "74c3f423-aeb3-47ac-5a46-483a27cdceb4",
+    "meta": {
+    "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-procedure" ]
+    },
+    "status": "completed",
+    "code": {
+    "coding": [ {
+        "system": "http://snomed.info/sct",
+        "code": "710824005",
+        "display": "Assessment of health and social care needs (procedure)"
+    } ],
+    "text": "Assessment of health and social care needs (procedure)"
+    },
+    "subject": {
+    "reference": "urn:uuid:8c95253e-8ee8-9ae8-6d40-021d702dc78e"
+    },
+    "encounter": {
+    "reference": "urn:uuid:f724d3b7-af81-5249-eff1-8bc0c4831f7d"
+    },
+    "performedPeriod": {
+    "start": "1988-09-12T03:00:18+01:00",
+    "end": "1988-09-12T03:50:43+01:00"
+    },
+    "location": {
+    "reference": "Location?identifier=https://github.com/synthetichealth/synthea|08770baf-f5e6-3a1a-af4f-1d8be70df56f",
+    "display": "MASS LUNG AND ALLERGY PC"
+    }
+}

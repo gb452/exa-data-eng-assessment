@@ -1,0 +1,42 @@
+{
+      "resourceType": "Condition",
+      "id": "2b9b5daf-ef78-63c7-3edc-cfc0a209eee0",
+      "meta": {
+        "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition" ]
+      },
+      "clinicalStatus": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+          "code": "active"
+        } ]
+      },
+      "verificationStatus": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+          "code": "confirmed"
+        } ]
+      },
+      "category": [ {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+          "code": "encounter-diagnosis",
+          "display": "Encounter Diagnosis"
+        } ]
+      } ],
+      "code": {
+        "coding": [ {
+          "system": "http://snomed.info/sct",
+          "code": "224299000",
+          "display": "Received higher education (finding)"
+        } ],
+        "text": "Received higher education (finding)"
+      },
+      "subject": {
+        "reference": "urn:uuid:8c95253e-8ee8-9ae8-6d40-021d702dc78e"
+      },
+      "encounter": {
+        "reference": "urn:uuid:4dbc90e0-b7b2-482c-24af-1405654e59ae"
+      },
+      "onsetDateTime": "1962-10-22T03:50:09+01:00",
+      "recordedDate": "1962-10-22T03:50:09+01:00"
+    }

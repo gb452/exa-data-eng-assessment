@@ -1,0 +1,16 @@
+{
+      "resourceType": "Medication",
+      "id": "6fb8c8c4-e1ba-54e6-0b4f-861d12f1870a",
+      "meta": {
+        "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-medication" ]
+      },
+      "code": {
+        "coding": [ {
+          "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+          "code": "1659131",
+          "display": "piperacillin 2000 MG / tazobactam 250 MG Injection"
+        } ],
+        "text": "piperacillin 2000 MG / tazobactam 250 MG Injection"
+      },
+      "status": "active"
+    }

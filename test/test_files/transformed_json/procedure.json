@@ -1,0 +1,9 @@
+{
+    "id": "74c3f423-aeb3-47ac-5a46-483a27cdceb4",
+    "patient_id": "8c95253e-8ee8-9ae8-6d40-021d702dc78e",
+    "encounter_id": "f724d3b7-af81-5249-eff1-8bc0c4831f7d",
+    "status": "completed",
+    "performed_period_start": "1988-09-12 03:00:18",
+    "performed_period_end": "1988-09-12 03:50:43",
+    "location": "MASS LUNG AND ALLERGY PC"
+}

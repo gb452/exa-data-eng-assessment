@@ -1,0 +1,12 @@
+{
+    "id": "f08c8f1a-32c8-3e41-09e2-de833713706c",
+    "patient_id": "8c95253e-8ee8-9ae8-6d40-021d702dc78e",
+    "status": "finished",
+    "type": "General examination of patient (procedure)",
+    "start_date": "1997-09-15 03:00:18",
+    "end_date": "1997-09-15 03:15:18",
+    "subject": "Mr. Aaron697 Dickens475",
+    "participant": "Dr. Wilmer32 Heidenreich818",
+    "location": "MASS LUNG AND ALLERGY PC",
+    "service_provider": "MASS LUNG AND ALLERGY PC"
+}

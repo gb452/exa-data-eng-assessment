@@ -5,19 +5,16 @@ from shutil import move
 
 
 # from extract import extract_patient 
-from loader import load_and_transform_json, RESOURCE_TYPES
-from constants import FILE_DIR, PROCESSED_FILE_DIR, FAILED_FILE_DIR
-
+from constants import RESOURCE_TYPES
+from loader import load_json
+from extract import transform_json
 from database import send_object
 
+FILE_DIR = "./files"
 
-# filename = "../data/Aaron697_Dickens475_8c95253e-8ee8-9ae8-6d40-021d702dc78e.json"
+PROCESSED_FILE_DIR = f"{FILE_DIR}/finished"
 
-# with open(filename, "r") as patient_file:
-#     json_data = json.load(patient_file)
-
-# the_patient = Patient.model_validate(json_data["entry"][0]["resource"])
-# print(the_patient.managingOrganization)
+FAILED_FILE_DIR = f"{FILE_DIR}/failed"
 
 
 def start():
@@ -50,9 +47,11 @@ def start():
                     # each fhir file has all of the data under the "entry" key.
                     for patient_data_entry in raw_json["entry"]:
                         if patient_data_entry["resource"]["resourceType"] in RESOURCE_TYPES:
+                            loaded_data = load_json(patient_data_entry["resource"])
+                            transformed_data = transform_json(patient_data_entry["resource"]["resourceType"], loaded_data)
                             fhir_objects.append({
                                 "table": patient_data_entry["resource"]["resourceType"],
-                                "data": load_and_transform_json(patient_data_entry["resource"])
+                                "data": transformed_data
                             })
                     for fhir_object in fhir_objects:
                         send_object(fhir_object)

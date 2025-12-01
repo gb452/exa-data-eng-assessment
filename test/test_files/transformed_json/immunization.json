@@ -1,0 +1,9 @@
+{
+    "id": "eaa88d9e-c4a0-d2f4-a40c-0741ead3f532",
+    "patient_id": "8c95253e-8ee8-9ae8-6d40-021d702dc78e",
+    "encounter_id": "93dab9db-4210-33f5-4023-57dd3e609bc8",
+    "vaccine_code": "140",
+    "vaccine_type": "Influenza, seasonal, injectable, preservative free",
+    "occurrence_date": "1990-09-17 03:00:18",
+    "location": "MASS LUNG AND ALLERGY PC"
+}

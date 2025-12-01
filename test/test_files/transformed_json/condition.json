@@ -1,0 +1,11 @@
+{
+    "id": "2b9b5daf-ef78-63c7-3edc-cfc0a209eee0",
+    "patient_id": "8c95253e-8ee8-9ae8-6d40-021d702dc78e",
+    "encounter_id": "4dbc90e0-b7b2-482c-24af-1405654e59ae",
+    "clinical_status": "active",
+    "verification_status": "confirmed",
+    "category": "Encounter Diagnosis",
+    "onset_date": "1962-10-22 03:50:09",
+    "abatement_date": null,
+    "condition_information": "Received higher education (finding)"
+}

@@ -1,0 +1,13 @@
+{
+    "id": "8623c82b-94d5-2996-fa6a-a7029b239d34",
+    "patient_id": "8c95253e-8ee8-9ae8-6d40-021d702dc78e",
+    "encounter_id": "f724d3b7-af81-5249-eff1-8bc0c4831f7d",
+    "condition_id": "65afcae6-4a6b-aeb0-bf5f-bb3714208716",
+    "status": "active",
+    "billable_period_start": "1988-09-12 03:00:18",
+    "billable_period_end": "1988-09-12 03:15:18",
+    "provider": "MASS LUNG AND ALLERGY PC",
+    "priority": "normal",
+    "insurance_coverage": "NO_INSURANCE",
+    "total_cost": "786.33USD"
+}
