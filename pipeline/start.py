@@ -1,6 +1,7 @@
 import time
 import json
-import os
+from os import listdir, makedirs
+from os.path import join
 from shutil import move
 
 
@@ -17,7 +18,7 @@ PROCESSED_FILE_DIR = f"{FILE_DIR}/finished"
 FAILED_FILE_DIR = f"{FILE_DIR}/failed"
 
 
-def start():
+def start(test=False):
     """
     Main function for running the pipeline.
 
@@ -28,17 +29,17 @@ def start():
     If it fails move it to a subfolder called "failed".
     """
 
-    os.makedirs(FILE_DIR, exist_ok=True)
-    os.makedirs(PROCESSED_FILE_DIR, exist_ok=True)
-    os.makedirs(FAILED_FILE_DIR, exist_ok=True)
+    makedirs(FILE_DIR, exist_ok=True)
+    makedirs(PROCESSED_FILE_DIR, exist_ok=True)
+    makedirs(FAILED_FILE_DIR, exist_ok=True)
 
     # continue to loop forever so we can pick up any new files
     while True:
-        if found_files := [f for f in os.listdir(FILE_DIR) if f.endswith('.json')]:
+        if found_files := [f for f in listdir(FILE_DIR) if f.endswith('.json')]:
             # go through each file
             for input_file in found_files:
                 try:
-                    with open(os.path.join(FILE_DIR, input_file), "r") as file_data:
+                    with open(join(FILE_DIR, input_file), "r") as file_data:
                         raw_json = json.load(file_data)
 
                     # represents the objects for this fhir file
@@ -55,11 +56,13 @@ def start():
                             })
                     for fhir_object in fhir_objects:
                         send_object(fhir_object)
-                    move(os.path.join(FILE_DIR, input_file), os.path.join(PROCESSED_FILE_DIR, input_file))
+                    move(join(FILE_DIR, input_file), join(PROCESSED_FILE_DIR, input_file))
                     print(f"Successfully processed file {input_file}!")
                 except Exception as exc:
-                    move(os.path.join(FILE_DIR, input_file), os.path.join(FAILED_FILE_DIR, input_file))
+                    move(join(FILE_DIR, input_file), join(FAILED_FILE_DIR, input_file))
                     print(f"Processing error: {exc}")
+        if test:
+            break
         time.sleep(1)
 
 

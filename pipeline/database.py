@@ -7,7 +7,7 @@ from functools import lru_cache
 import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.exc import ProgrammingError, OperationalError
 
 from pandas import json_normalize
 
@@ -22,13 +22,16 @@ def get_db_engine() -> Engine:
     
     :return: sqlalchemy.engine.Engine instance
     """
-    db_host = os.getenv('DATABASE_HOSTNAME', "localhost")
-    db_port = os.getenv('DATABASE_PORT', "5433")
-    db_name = os.getenv('DATABASE_NAME', "patientdata")
-    db_user = os.getenv('DATABASE_USERNAME', "postgres")
-    db_pass = os.getenv('DATABASE_PASSWORD', "mypassword")
+    # this will be used for testing, if not set then we will have each
+    # part of the url as individual args
+    if not (db_url := os.getenv("DATABASE_URL")):
+        db_host = os.getenv('DATABASE_HOSTNAME')
+        db_port = os.getenv('DATABASE_PORT')
+        db_name = os.getenv('DATABASE_NAME')
+        db_user = os.getenv('DATABASE_USERNAME')
+        db_pass = os.getenv('DATABASE_PASSWORD')
 
-    db_url = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+        db_url = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
 
     engine = create_engine(db_url)
     return engine
@@ -45,22 +48,16 @@ def send_object(fhir_object):
         entry = json_normalize(fhir_object["data"])
         # Below line is AI generated - drops the "resource." part from column names.
         entry.columns = entry.columns.str.replace('resource.', '')
-
         try:
             # check if this id already exists
             with engine.connect() as connection:
                 exists = bool(connection.execute(
-                    text(f'SELECT id FROM "{fhir_object['table']}" WHERE id = :id'),
+                    text(f'SELECT id FROM "{fhir_object["table"]}" WHERE id = :id'),
                     {'id': fhir_object["data"]["id"]}
                 ).scalar())
-                print(f"From first section: {exists=}")
-        except ProgrammingError as exc:
-            # allow UndefinedTable error as if it doesn't exist it gets created below
-            print("does not exist?")
-            print(exc)
-            print("^")
+        except (ProgrammingError, OperationalError):
+            # allow tables not to be defined, if it doesn't exist here it gets created below
             exists = False
-        print(f"{exists=}")
         if exists:
             print(
                 f"ID {fhir_object['data']['id']} "
