@@ -14,7 +14,7 @@ from constants import RESOURCE_TYPES
 # Various bits below are AI generated and then adjusted by me over time (I marked where it ends)
 def _load_resource_class(resource_name: str) -> FHIRAbstractModel:
     """
-    Load the relevant fhir.resources object, for use in a mapping of the string name to the object.
+    Import the relevant fhir.resources object, for use in a mapping of the string name to the object.
 
     This is done as otherwise each one will have to be imported individually and the mapping made by hand
 
@@ -25,13 +25,14 @@ def _load_resource_class(resource_name: str) -> FHIRAbstractModel:
     :param resource_name: The name of the resource pulled from the JSON data
     :return: fhir.resources object for this resource name
     """
-    # import the module, for example fhir.resources.patient
+    # import the module, for example fhir.resources.R4B.patient
     # we need to specify fhir version R4B as the package defaults to R5.
     # The data provided is version R4B.
     module = importlib.import_module(f"fhir.resources.R4B.{resource_name.lower()}")
     # get the object from the module. for example, fhir.resources.patient contains the module Patient
     # the mapping in resource_types above is used for this
     return getattr(module, resource_name)
+
 
 # finally, create a reusable mapping containing all of the modules we need to process the example data
 IMPORT_MAP = {name: _load_resource_class(name) for name in RESOURCE_TYPES}
@@ -42,7 +43,7 @@ def load_json(json_entry: dict[str, Any]) -> dict[str, str]:
     """
     Given a raw JSON entry from a fhir file, load it into a fhir.resources object.
 
-    Don't expect any errors, as start.py will handle these and cancel processing if so.
+    Don't except any errors, as start.py will handle these and cancel processing if so.
 
     :param json_entry: JSON entry from the fhir file.
     :return: A fhir.resources object representing the data.

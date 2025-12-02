@@ -10,8 +10,10 @@ def test_e2e(capsys, monkeypatch, test_db_engine, check_item_exists_in_table):
     and that an item exists in the Patient table with the expected ID.
     """
     # monkey patch the get_db_engine function with the test db engine
+    # Do this so we use the in-memory db from the test_db_engine fixture
     monkeypatch.setattr("db.get_db_engine", test_db_engine)
     # patch out os.makedirs to do nothing
+    # Do this and all the other ones below so that we don't create any files or directories while testing
     monkeypatch.setattr("pipeline.start.makedirs", lambda x, exist_ok: None)
     # patch out shutil.move to do nothing
     monkeypatch.setattr("shutil.move", lambda x, y: None)

@@ -9,7 +9,6 @@ import sys
 from os.path import abspath, dirname
 
 from sqlalchemy import create_engine, text
-from sqlalchemy.pool import StaticPool
 
 
 # fix imports for the pipeline (normally it will be running in a container)

@@ -12,6 +12,7 @@ def setup(monkeypatch, test_db_engine):
     Setup function that runs before each database test
     """
     # Monkey patch the get_db_engine function with the test db engine
+    # Do this for every test so we use the in-memory db from the test_db_engine fixture
     monkeypatch.setattr("pipeline.db.get_db_engine", test_db_engine)
 
 

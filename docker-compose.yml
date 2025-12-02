@@ -9,6 +9,9 @@ services:
       - DATABASE_NAME=${DATABASE_NAME}
       - DATABASE_USERNAME=${DATABASE_USERNAME}
     volumes:
+      # mount the files folder as a volume
+      # this lets us copy files into this directory on the host
+      # and have them show up in the container
       - ./pipeline/files:/pipeline/files
     depends_on:
       patient_data:
@@ -22,6 +25,7 @@ services:
         - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
         - POSTGRES_DB=${DATABASE_NAME}
       volumes:
+        # mount point for the database data
         - ./database:/var/lib/postgresql
       healthcheck:
         test: ["CMD-SHELL", "pg_isready -U postgres -d patientdata"]

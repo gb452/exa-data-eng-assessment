@@ -21,26 +21,31 @@ Once everything is built, you can send files to be processed by placing them int
 Don't put them inside the `failed` or `finished` subdirectories, as this is where files that have been processed are placed.
 
 The pipeline will automatically ingest new files from this directory, and move them to one of those subfolders once finished.
+It will process one file at a time, some will take longer depending on the amount of data in them (the test files range from a few hundred kb to about 20mb!).
+On average it's 1-10 seconds for each file.
 
 To view just the logs for the processing service, use `docker compose logs data_processing`.
+(Running docker compose as above will gives logs for both containers, but the database logs are mostly unnecessary)
 
 The data storage layer is Postgres, so you can use any tool like pgAdmin4 to view the database in a GUI. The server will be mapped to run on localhost:5433 by docker. Connectivity information can be found in the `.env` variables file. (note that the port in there is 5432 as that is used inside the docker container - you should still use 5433 when connecting outside of it)
 
 # Tests
 
 The tests are written with Pytest, so you can just run `pytest` from the main directory to run them.
+Set up a python virtualenv and install the requirements.txt file beforehand, if you don't already have the packages installed.
 
 There are 16 tests in total.
 
 # Data validation, extraction, transformation and loading
 
-This is some information about the technical approach for my solution.
+This is some information about a fwe details with the technical approach for my solution.
 
 As mentioned above my pipeline will also check you're sending valid FHIR data.
 
-To do this I have used a library called `fhir.resources`.
+To do this I have used a Python library called `fhir.resources`.
 
 This library translates the raw data into Pydantic models, which does the validation for me, and also makes it easier to pull out the relevant parts of the data.
+It would no doubt be faster to just access the JSON directly, as that would skip out loading the data into the model, but having the extra validation is a useful feature.
 
 Once the data is validated, it's pulled out of the model and transformed into a workable format.
 This consists of a flat dictionary, and the values are different for each model.
@@ -50,3 +55,8 @@ After the data has been transformed it can be loaded into the database.
 To do this as simply as possible, the data is put into a pandas dataframe, which then lets me use the `to_sql` function in pandas to send this straight into the database and create any new tables on the fly.
 
 There is some more discussion around that setup in the `db.py` file.
+
+# AI usage
+
+As it was mentioned in my first interview that AI usage was allowed in this tech test I have used it in a few places.
+I have marked any places I've used with appropriate comments, along with explanations as to what the code is doing.
