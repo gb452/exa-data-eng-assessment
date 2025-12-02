@@ -1,36 +1,52 @@
-# Data Engineer - Technical Assesment
-Our tech teams are curious, driven, intelligent, pragmatic, collaborative and open-minded and you should be too. 
+# Data processing tool
 
-## Testing Goals
-We are testing your ability to design and prototype a scalable data-pipeline (with code) underpinned with good data/software engineering principles from a blank canvas. You will need to use your intellect, creativity, judgement and be comfortable making decisions to produce a solution. 
+Thank you for taking the time to look at my submission for the tech test.
 
-You will have approximately 1 week to complete this task but can as much or as little time as you deem necessary to **demonstrate your understanding of the problem, your range of skills and approach to problem solving**.
+This solution meets the requirements of the outline in the original README:
 
-Some successful candidates have spent as little as 3 hours whilst others have used the full week because they've enjoyed exploring different ideas, technologies and approaches. 
+- Takes in FHIR data
+- Transforms it to a usable format
+- Uploads it to a data storage layer
+- Containerised with docker-compose
 
-## The Task
-An external system / supplier is sending patient data to our platform using the FHIR standard. Our analytics teams find this format difficult to work with when creating dashboards and visualizations. You are required to tranform these FHIR messages into a more workable format preferably in a tabular format. Include any documentation / commentary you deem necessary.
+This solution also verifies that the FHIR data being entered is valid data.
 
+Tests have also been written for each part of the pipeline. These are detailed further down.
 
-## The Solution
-If you are applying for a position that uses one specific programming language, please write your solution in that language, otherwise your solution can use any of the following technologies along with **any frameworks, libraries you feel appropriate**:
+# Running
 
-- **Programming Languages** - Java / Python / Scala / Go / C#
-- **Data Storage Layer** - MongoDB / MySql / Postgres / SQLServer Express / Filesystem (CSV/Parquet/Orc)
+To get right in and run the pipeline, run `docker compose up --build` from the main directory of this repo.
 
-Containerising your pipeline using docker / docker-compose is strongly encouraged, but not required.
+Once everything is built, you can send files to be processed by placing them into the `pipeline/files` directory.
+Don't put them inside the `failed` or `finished` subdirectories, as this is where files that have been processed are placed.
 
-## Evaluation
-We take into account 5 areas when evaluating a solution. Each criteria is evaluated from 0 (non-existent) to 5 (excellent) and your final score would be a simple average across all 5 areas. These are:
+The pipeline will automatically ingest new files from this directory, and move them to one of those subfolders once finished.
 
-- **Functionality**: Is the solution correct? Does it run in a decent amount of time? How well thought and architected is the solution?
-- **Good Practices**: Does the code follow standard practices for the language and framework used? Take into account reusability, names, function length, structure, how crendentials are handled, etc.
-- **Testing**: Unit and integration tests.
-- **Execution environment**: Container, Virtual Environment, Dependency Management, Isolation, Ease of transition into a production environment etc.
-- **Documentation**: How to install and run the solution? How to see and use the results? What is the architecture? Any next steps?
+To view just the logs for the processing service, use `docker compose logs data_processing`.
 
-## Context
-[FHIR](/https://www.hl7.org/fhir/overview.html) is a popular standard within healthcare used by healthcare systems to exchange data and represent details of paitents in a standardised way. Some sample FHIR data has been generated in the data directory using a tool called [synthea](https://www.hl7.org/fhir/overview.html). 
+The data storage layer is Postgres, so you can use any tool like pgAdmin4 to view the database in a GUI. The server will be mapped to run on localhost:5433 by docker. Connectivity information can be found in the `.env` variables file. (note that the port in there is 5432 as that is used inside the docker container - you should still use 5433 when connecting outside of it)
 
-## Submit your solution	
-Create a public Github repository and push your solution including any documentation you feel necessary. Commit often - we would rather see a history of trial and error than a single monolithic push. When you're finished, please send us the URL to the repository. 
+# Tests
+
+The tests are written with Pytest, so you can just run `pytest` from the main directory to run them.
+
+There are 16 tests in total.
+
+# Data validation, extraction, transformation and loading
+
+This is some information about the technical approach for my solution.
+
+As mentioned above my pipeline will also check you're sending valid FHIR data.
+
+To do this I have used a library called `fhir.resources`.
+
+This library translates the raw data into Pydantic models, which does the validation for me, and also makes it easier to pull out the relevant parts of the data.
+
+Once the data is validated, it's pulled out of the model and transformed into a workable format.
+This consists of a flat dictionary, and the values are different for each model.
+You can see this in the `extract.py` file.
+
+After the data has been transformed it can be loaded into the database.
+To do this as simply as possible, the data is put into a pandas dataframe, which then lets me use the `to_sql` function in pandas to send this straight into the database and create any new tables on the fly.
+
+There is some more discussion around that setup in the `db.py` file.

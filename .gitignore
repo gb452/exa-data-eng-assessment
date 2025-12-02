@@ -1,2 +1,6 @@
+# virtualenv
 .venv
+# pycache
 __pycache__
+# db mount point for docker container
+database/

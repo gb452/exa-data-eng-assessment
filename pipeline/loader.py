@@ -10,16 +10,15 @@ from typing import Any
 
 from constants import RESOURCE_TYPES
 
+
 # Various bits below are AI generated and then adjusted by me over time (I marked where it ends)
-
-
 def _load_resource_class(resource_name: str) -> FHIRAbstractModel:
     """
     Load the relevant fhir.resources object, for use in a mapping of the string name to the object.
 
     This is done as otherwise each one will have to be imported individually and the mapping made by hand
 
-    Essentially, this is neater and takes up less space.
+    Essentially, this is neater and takes up less space which is why I opted to do it this way.
 
     Type hint for FHIRAbstractModel as this covers all of our possible resource types.
 
