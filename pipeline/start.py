@@ -1,20 +1,30 @@
-import time
+"""
+Main processing file for the data pipeline:
+
+- read files from the input directory
+- validate data
+- transform data
+- send data to database
+- move each processed file to the finished folder
+
+If processing fails then move the file to the failed folder and continue to the next file.
+
+Once all currently found files have been processed, wait until more files have been added.
+Repeat the process if more arrive.
+"""
 import json
 from os import listdir, makedirs
-from os.path import join
+from os.path import join, dirname, abspath
 from shutil import move
+import time
 
-
-# from extract import extract_patient 
 from constants import RESOURCE_TYPES
-from loader import load_json
 from extract import transform_json
-from database import send_object
+from db import send_object
+from loader import load_json
 
-FILE_DIR = "./files"
-
+FILE_DIR = f"{dirname(abspath(__file__))}/files"
 PROCESSED_FILE_DIR = f"{FILE_DIR}/finished"
-
 FAILED_FILE_DIR = f"{FILE_DIR}/failed"
 
 
@@ -32,6 +42,10 @@ def start(test=False):
     makedirs(FILE_DIR, exist_ok=True)
     makedirs(PROCESSED_FILE_DIR, exist_ok=True)
     makedirs(FAILED_FILE_DIR, exist_ok=True)
+
+    print(f"{FILE_DIR=}")
+    print(f"{PROCESSED_FILE_DIR=}")
+    print(f"{FAILED_FILE_DIR=}")
 
     # continue to loop forever so we can pick up any new files
     while True:

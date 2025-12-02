@@ -1,5 +1,5 @@
 """
-Constant values used in the pipeline
+Constant values used in the pipeline that are shared between multiple files
 """
 
 # A mapping of resource type to extraction function

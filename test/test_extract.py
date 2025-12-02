@@ -1,11 +1,9 @@
-# test/test_extract.py
-
 """
 Tests for extract.py
 
 These are basic tests that will verify a provided fhir.resource object
 is transformed into the expected JSON output. Further validation
-and error handling is handled in test_loader.py
+is handled in test_loader.py
 """
 
 from fhir.resources.R4B.patient import Patient

@@ -43,14 +43,13 @@ def load_json(json_entry: dict[str, Any]) -> dict[str, str]:
     """
     Given a raw JSON entry from a fhir file, load it into a fhir.resources object.
 
+    Don't expect any errors, as start.py will handle these and cancel processing if so.
+
     :param json_entry: JSON entry from the fhir file.
     :return: A fhir.resources object representing the data.
     """
-    try:
-        # find our resource type
-        resource_type = json_entry["resourceType"]
-        # load our raw data into the fhir.resources class to validate it
-        loaded_resource = IMPORT_MAP[resource_type].model_validate(json_entry)
-        return loaded_resource
-    except Exception as exc:
-        print(f"Failed to load data into FHIR Resource: {exc}, {exc.__class__.__name__}")
+    # find our resource type
+    resource_type = json_entry["resourceType"]
+    # load our raw data into the fhir.resources class to validate it
+    loaded_resource = IMPORT_MAP[resource_type].model_validate(json_entry)
+    return loaded_resource

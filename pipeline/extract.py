@@ -9,8 +9,9 @@ a database.
 The other benefit of using fhir.resources is that we don't have to
 directly access the JSON.
 
-These functions aren't directly called, instead they are used in the
-RESOURCE_TYPES dictionary in loader.py
+The functions related to each fhir resource are used to create a mapping
+of resource type strint to function, so that there isn't a large if/elif statement
+calling each of the functions for each resource type (see bottom of this file)
 """
 
 from datetime import datetime
@@ -23,7 +24,6 @@ def patient(patient) -> dict[str, str]:
     :param patient: fhir.resources Patient object
     :return: Processed and sanitised data in a dictionary ready for database entry
     """
-
     return_dict = {}
 
     # basic entries for these values that will be overridden if they exist
@@ -82,8 +82,8 @@ def encounter(encounter) -> dict[str, str]:
     :param patient: fhir.resources Encounter object
     :return: Processed and sanitised data in a dictionary ready for database entry
     """
-
     return_dict = {}
+
     return_dict["id"] = encounter.id
     return_dict["patient_id"] = encounter.subject.reference.split(":")[-1]
     return_dict["status"] = encounter.status
@@ -105,13 +105,11 @@ def condition(condition) -> dict[str, str]:
     :param patient: fhir.resources Condition object
     :return: Processed and sanitised data in a dictionary ready for database entry
     """
-
     return_dict = {}
 
     return_dict["id"] = condition.id
     return_dict["patient_id"] = condition.subject.reference.split(":")[-1]
     return_dict["encounter_id"] = condition.encounter.reference.split(":")[-1]
-
     return_dict["clinical_status"] = condition.clinicalStatus.coding[0].code
     return_dict["verification_status"] = condition.verificationStatus.coding[0].code
     return_dict["category"] = condition.category[0].coding[0].display
@@ -133,7 +131,6 @@ def claim(claim) -> dict[str, str]:
     :param patient: fhir.resources Claim object
     :return: Processed and sanitised data in a dictionary ready for database entry
     """
-
     return_dict = {}
 
     return_dict["id"] = claim.id
@@ -162,7 +159,6 @@ def procedure(procedure) -> dict[str, str]:
     :param patient: fhir.resources Procedure object
     :return: Processed and sanitised data in a dictionary ready for database entry
     """
-
     return_dict = {}
 
     return_dict["id"] = procedure.id
@@ -183,7 +179,6 @@ def immunization(immunization) -> dict[str, str]:
     :param patient: fhir.resources Immunization object
     :return: Processed and sanitised data in a dictionary ready for database entry
     """
-    
     return_dict = {}
 
     return_dict["id"] = immunization.id
@@ -204,7 +199,6 @@ def medicationrequest(medicationrequest) -> dict[str, str]:
     :param patient: fhir.resources MedicationRequest object
     :return: Processed and sanitised data in a dictionary ready for database entry
     """
-    
     return_dict = {}
 
     return_dict["id"] = medicationrequest.id
@@ -240,7 +234,6 @@ def medication(medication) -> dict[str, str]:
     :param patient: fhir.resources Medication object
     :return: Processed and sanitised data in a dictionary ready for database entry
     """
-    
     return_dict = {}
 
     return_dict["id"] = medication.id
@@ -262,9 +255,12 @@ RESOURCE_MAPPING = {
     "Medication": medication,
 }
 
-def transform_json(resource_type, json_data):
-    
+def transform_json(resource_type: str, fhir_object) -> dict[str, str]:
+    """
+    Given a resource type and a fhir.resources object, transform the data
+    into a format usable for database entry.
+    """
     transformation_function = RESOURCE_MAPPING[resource_type]
     
     # return the output of the function
-    return transformation_function(json_data)
+    return transformation_function(fhir_object)

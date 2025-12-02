@@ -14,7 +14,8 @@ from pandas import json_normalize
 
 # this function is AI generated as it's essentially just boilerplate code
 # gets a connection to the db
-# (except for lru_cache which I added so that we reuse the connection)
+# (except for lru_cache which I added so that we reuse the connection rather than create a fresh
+# one for every operation)
 @lru_cache()
 def get_db_engine() -> Engine:
     """
@@ -22,34 +23,32 @@ def get_db_engine() -> Engine:
     
     :return: sqlalchemy.engine.Engine instance
     """
-    # this will be used for testing, if not set then we will have each
-    # part of the url as individual args
-    if not (db_url := os.getenv("DATABASE_URL")):
-        db_host = os.getenv('DATABASE_HOSTNAME')
-        db_port = os.getenv('DATABASE_PORT')
-        db_name = os.getenv('DATABASE_NAME')
-        db_user = os.getenv('DATABASE_USERNAME')
-        db_pass = os.getenv('DATABASE_PASSWORD')
+    db_host = os.getenv('DATABASE_HOSTNAME')
+    db_port = os.getenv('DATABASE_PORT')
+    db_name = os.getenv('DATABASE_NAME')
+    db_user = os.getenv('DATABASE_USERNAME')
+    db_pass = os.getenv('DATABASE_PASSWORD')
 
-        db_url = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+    db_url = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
 
     engine = create_engine(db_url)
     return engine
 
 
-def send_object(fhir_object):
+def send_object(fhir_object: dict[str, str]):
     """
     Upload JSON representing the FHIR object to the database
+
+    :param fhir_object: JSON representing the transformed FHIR data
     """
 
     if fhir_object["data"]:
         engine = get_db_engine()
-        # turn into a pandas dataframe
+        # turn into a pandas dataframe, set up the column names properly
         entry = json_normalize(fhir_object["data"])
-        # Below line is AI generated - drops the "resource." part from column names.
         entry.columns = entry.columns.str.replace('resource.', '')
         try:
-            # check if this id already exists
+            # check if this id already exists in the database
             with engine.connect() as connection:
                 exists = bool(connection.execute(
                     text(f'SELECT id FROM "{fhir_object["table"]}" WHERE id = :id'),
@@ -57,6 +56,7 @@ def send_object(fhir_object):
                 ).scalar())
         except (ProgrammingError, OperationalError):
             # allow tables not to be defined, if it doesn't exist here it gets created below
+            # (this also means the ID doesn't exist!)
             exists = False
         if exists:
             print(
@@ -69,7 +69,7 @@ def send_object(fhir_object):
         # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_sql.html
         # in a production environment it would be more sensible to
         # create defined schemas for the tables, but for a simple ETL app
-        # like this it works and it's also fast to set up
+        # like this it works well, with the bonus of being faster to set up.
         entry.to_sql(
             name=fhir_object["table"],
             con=engine,

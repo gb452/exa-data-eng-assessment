@@ -2,15 +2,23 @@
 Tests for database connectivity
 """
 
-from pipeline.database import send_object
+import pytest
+from pipeline.db import send_object
 
 
-def test_send_to_database_new_item_new_table(
-        load_json_fixture, check_table_exists, check_item_exists_in_table, test_db_engine, monkeypatch):
+@pytest.fixture(autouse=True)
+def setup(monkeypatch, test_db_engine):
+    """
+    Setup function that runs before each database test
+    """
+    # Monkey patch the get_db_engine function with the test db engine
+    monkeypatch.setattr("pipeline.db.get_db_engine", test_db_engine)
 
-    monkeypatch.setenv("DATABASE_URL", "sqlite://")
-    monkeypatch.setattr("pipeline.database.get_db_engine", test_db_engine)
 
+def test_send_to_database_new_item_new_table(load_json_fixture, check_table_exists, check_item_exists_in_table):
+    """
+    Test that a new item can be sent to the database, and a new table is created for it.
+    """
     # send new item
     transformed_data = load_json_fixture("transformed_json/medication.json")
     data_to_send ={
@@ -20,20 +28,16 @@ def test_send_to_database_new_item_new_table(
     send_object(data_to_send)
 
     # test table created with correct name
-
-    result = check_table_exists("Medication")
-    print(f"{result=}")
     assert check_table_exists("Medication") == True
 
     # test item is in table
     assert check_item_exists_in_table("Medication", transformed_data["id"]) == True
 
 
-def test_send_two_to_database(load_json_fixture, check_item_exists_in_table, test_db_engine, monkeypatch):
-
-    monkeypatch.setenv("DATABASE_URL", "sqlite://")
-    monkeypatch.setattr("pipeline.database.get_db_engine", test_db_engine)
-
+def test_send_two_to_database(load_json_fixture, check_item_exists_in_table):
+    """
+    Test that when two items are sent to an empty database, two items exist in the resulting table.
+    """
     # send one item
     transformed_data = load_json_fixture("transformed_json/medication.json")
     data_to_send = {
@@ -53,11 +57,10 @@ def test_send_two_to_database(load_json_fixture, check_item_exists_in_table, tes
     assert check_item_exists_in_table("Medication", "new_id") == True
 
 
-def test_already_exists(load_json_fixture, test_db_engine, capsys, monkeypatch):
-
-    monkeypatch.setenv("DATABASE_URL", "sqlite://")
-    monkeypatch.setattr("pipeline.database.get_db_engine", test_db_engine)
-
+def test_already_exists(load_json_fixture, capsys):
+    """
+    Test that if an item already exists (based on id value), it is not added to the table
+    """
     # send one item
     transformed_data = load_json_fixture("transformed_json/medication.json")
     data_to_send = {
