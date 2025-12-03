@@ -17,7 +17,7 @@ Tests have also been written for each part of the pipeline. These are detailed f
 
 To get right in and run the pipeline, run `docker compose up --build` from the main directory of this repo.
 
-Once everything is built, you can send files to be processed by placing them into the `pipeline/files` directory.
+Once everything is built, you can send files to be processed by placing them into the `pipeline/files` directory. You may need to use `sudo` to copy them if the docker container created the directories for you.
 Don't put them inside the `failed` or `finished` subdirectories, as this is where files that have been processed are placed.
 
 The pipeline will automatically ingest new files from this directory, and move them to one of those subfolders once finished.
